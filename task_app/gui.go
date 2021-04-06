@@ -407,10 +407,12 @@ func create_sync_tab(a *taskApp) *fyne.Container {
 			a.StoreListAsJSONFile(a.file_uri, true)
 			a.f_stored = true
 
-			dialog.ShowConfirm("Sync", "Success", func(v bool) {
+			dia := dialog.NewInformation ("Sync", "Success", a.win)
+            dia.SetOnClosed ( func() {
 				a.show_tasks()
 				a.tabbar.SelectTab(a.w_tab_tasks)
-			}, a.win)
+            })
+            dia.Show()
 		} else {
 			dialog.ShowInformation("Sync", "Failed", a.win)
 		}

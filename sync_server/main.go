@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+    "os"
 	"net/http"
 )
 
@@ -36,7 +37,7 @@ func main() {
 
 	finish := make(chan bool)
 
-	fn = "/tmp/tasks.json"
+	fn = os.Getenv ("HOME") + "/tasks.json"
 	tasks = ParseTaskFile(fn)
 	if tasks == nil {
 		fmt.Println("Warning: main: no tasks read")

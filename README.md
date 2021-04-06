@@ -75,10 +75,8 @@ The app requires fyne at least in version 2.0.2  (https://fyne.io/)
 
 1.2 Android:
 
-- copy *go tasks.png .../tasks
-- cd .../tasks
-- fyne package -os android -appID com.mdu.tasks -icon tasks.png 
-- adb install tasks.apk
+- fyne package -os android -appID com.mdu.tasks -icon tasks.png -name taskmgr
+- adb install taskmgr.apk
 
 
 2. Build the sync server
