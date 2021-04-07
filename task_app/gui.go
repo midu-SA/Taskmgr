@@ -156,8 +156,7 @@ func create_task_tab(a *taskApp) *container.Scroll {
 				Owner:       a.current.Owner,
 				Prio:        a.current.Prio,
 			}
-			t.State = a.current.State
-			t.Done = a.current.Done
+			t.Done = false
 
 			a.current = t
 			a.tabbar.SelectTab(a.w_tab_details)
