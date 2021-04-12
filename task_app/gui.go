@@ -9,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+    "fyne.io/fyne/v2/storage"
 	"image/color"
 	"log"
 	"os"
@@ -24,7 +25,7 @@ var button_color = color.RGBA{R: 100, G: 150, B: 210, A: 255}
 /*****************************************************************************/
 func create_menu(a *taskApp) *fyne.MainMenu {
 	importItem := fyne.NewMenuItem("Import", func() {
-		dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
+		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 			if err != nil {
 				log.Println("Error: Import-1")
 				a.show_error("Import", err)
@@ -39,10 +40,15 @@ func create_menu(a *taskApp) *fyne.MainMenu {
 			a.readTasks(reader.URI())
 			a.win.SetContent(a.makeUI())
 		}, a.win)
+        //fd.SetFilter(storage.NewExtensionFileFilter([]string{".json"}))  
+        // works, but we do not force the user to export to file with extenion .json
+        
+        fd.Resize(fyne.NewSize(1000,800))
+        fd.Show()
 	})
 
 	exportItem := fyne.NewMenuItem("Export", func() {
-		dialog.ShowFileSave(func(writer fyne.URIWriteCloser, err error) {
+		fd := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
 			if err != nil {
 				log.Println("Error: Export-1")
 				a.show_error("export tasks", err)
@@ -56,6 +62,9 @@ func create_menu(a *taskApp) *fyne.MainMenu {
 			log.Println("Writing tasks to export file: ", writer.URI().Path())
 			a.StoreListAsJSONFile(writer.URI(), false) // including deleted tasks
 		}, a.win)
+        fd.SetFilter(storage.NewExtensionFileFilter([]string{".json"}))
+        fd.Resize(fyne.NewSize(1000,800))
+        fd.Show()
 	})
 
 	darkItem := fyne.NewMenuItem("Dark Theme", func() {
@@ -435,9 +444,7 @@ func create_sync_tab(a *taskApp) *fyne.Container {
 
 	b_box := container.New(layout.NewBorderLayout(nil, nil, c_start, c_cancel), c_start, c_cancel)
 
-	container_log := container.NewVScroll(a.w_sync_log)
-
-	return container.New(layout.NewBorderLayout(label, b_box, nil, nil), label, b_box, container_log)
+	return container.New(layout.NewBorderLayout(label, b_box, nil, nil), label, b_box, a.w_sync_log)
 }
 
 /* =============================================================================================== */
