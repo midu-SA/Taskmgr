@@ -54,12 +54,13 @@ func (a *taskApp) SaveDetails() {
 	a.current.Owner = a.w_owner.Text
 	a.current.Prio = prio
 	a.current.ModTime = time.Now().Unix()
-
+    
 	if a.w_details_done.Checked {
 		a.current.Done = true
 		a.current.State = state_done
 	} else {
 		a.current.Done = false
+		a.current.State, _ = get_state_color(a.current)
 	}
 
 	/* re-create lists with valid categories and owners, in case owner or category was changed */
@@ -83,28 +84,38 @@ func (a *taskApp) SaveDetails() {
 
 /* --------------------------------------------------------------------------------------------------- */
 /* return task list to display */
-func (a *taskApp) build_task_list() (li []*task) {
-	f_debug := true
+func (a *taskApp) build_task_list() ([]*task) {
+    proc_name := "build_task_list"
+    var li []*task
+	
+	f_debug := false
+	
+	fmt.Println (a.current)
 	a.current = nil
-	for _, t := range a.tasks {
+	
+	if f_debug {
+		log.Println(proc_name, "Tasklist Count: ", len(a.tasks))
+	}
+	for i, t := range a.tasks {
+        //if f_debug {log.Println ("Task-", i, ": ", t.Name)}
 		if t == nil {
-			continue
+            continue
 		}
 		if t.Deleted == true {
-			continue
+            continue
 		}
 		if a.f_show_filtered == true && t.matchFilter(a.filter) {
-			li = append(li, t)
+            li = append(li, t)
 		}
 		if a.f_show_filtered == false {
-			li = append(li, t)
+            li = append(li, t)
 		}
 	}
 	if f_debug {
-		log.Println("show_tasks", "Visible Task Count: ", len(li))
+		log.Println(proc_name, "Visible Task Count: ", len(li))
 	}
-	f_debug = false
-	return li
+    
+	return sortTasks (li)
 }
 
 /* --------------------------------------------------------------------------------------------------- */
@@ -204,35 +215,38 @@ func (a *taskApp) show_error(s string, err error) {
 func (t *task) matchFilter(filter S_FILTER) (ret bool) {
 	proc_name := "task.matchFilter: "
 	f_debug := false
-
 	ret = true
+	
 	if t == nil {
-		f_debug = false
+        if f_debug {log.Println(proc_name, "Task is nil")}
 		return false
 	}
 
 	if f_debug {
-		log.Println(proc_name, "Checking Task ", t.Name)
+		log.Println(proc_name, "Checking Task, Name: ", t.Name)
 	}
 	if filter.statuses[t.State] == false {
+        if f_debug {log.Println(proc_name, "Wrong State")}
 		ret = false
 	}
 
 	if filter.prios[t.Prio-1] == false {
+        if f_debug {log.Println(proc_name, "Wrong Prio")}
 		ret = false
 	}
 
 	if filter.category != "all" && filter.category != t.Category {
+        if f_debug {log.Println(proc_name, "Wrong Category")}
 		ret = false
 	}
 
 	if filter.owner != "all" && filter.owner != t.Owner {
+        if f_debug {log.Println(proc_name, "Wrong Owner")}
 		ret = false
 	}
 
 	if f_debug && ret == true {
 		log.Println(proc_name, "Returning true")
 	}
-	f_debug = false
 	return ret
 }

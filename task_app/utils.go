@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"time"
+    "sort"
 )
 
 const (
@@ -183,4 +184,28 @@ func make_owner_list(tasks []*task) (li []string) {
 	}
 	f_debug = false
 	return li
+}
+
+
+func (t *task) getWarnDate () (int64) {
+    duedate, _ := time.Parse("060102", t.Duedate)
+    return duedate.Unix() - (int64) (t.Ahead * 24 * 3600)
+}
+
+
+
+/* ------------------------------------------------------------------------- */
+/* Sort Tasks by Duedate - ahead */
+
+type ByDate []*task
+
+func (li ByDate) Len() int           { return len(li) }
+func (li ByDate) Less(i, j int) bool { return li[i].getWarnDate() < li[j].getWarnDate() }
+func (li ByDate) Swap(i, j int)      { li[i], li[j] = li[j], li[i] }
+
+
+
+func sortTasks (li []*task) ([]*task) {
+	sort.Sort (ByDate(li))
+    return li
 }
