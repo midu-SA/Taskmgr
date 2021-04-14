@@ -96,7 +96,7 @@ func (a *taskApp) build_task_list() ([]*task) {
 	if f_debug {
 		log.Println(proc_name, "Tasklist Count: ", len(a.tasks))
 	}
-	for i, t := range a.tasks {
+	for _, t := range a.tasks {
         //if f_debug {log.Println ("Task-", i, ": ", t.Name)}
 		if t == nil {
             continue
